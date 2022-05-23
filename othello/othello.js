@@ -104,24 +104,24 @@ function rotate(){
 }
 
 document.getElementById("startbutton1").onclick=function(){
-  init();
   computer=false;
   gray=false;
+  init();
 }
 document.getElementById("startbutton2").onclick=function(){
-  init();
   computer=false;
   gray=true;
+  init();
 }
 document.getElementById("startbutton3").onclick=function(){
-  init();
   computer=true;
   gray=false;
+  init();
 }
 document.getElementById("startbutton4").onclick=function(){
-  init();
   computer=true;
   gray=true;
+  init();
 }
 
 function finish(){
