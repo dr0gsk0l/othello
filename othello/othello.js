@@ -141,7 +141,10 @@ function finish(){
   }
   points.innerText="黒:"+blackpoints.toString()+" 白:"+whitepoints.toString();
   if(computer){
-    if(blackpoints>whitepoints)result.innerText="You Win!";
+    if(blackpoints>whitepoints){
+      if(gray)result.innerText="You Win! Great!!";
+      else result.innerText="You Win!";
+    }
     if(blackpoints<whitepoints)result.innerText="You Lose!";
     if(blackpoints==whitepoints)result.innerText="Draw!";
   }
