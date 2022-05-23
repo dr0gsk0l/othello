@@ -130,10 +130,6 @@ document.getElementById("startbutton4").onclick=function(){
 }
 
 function finish(){
-  if(gray){
-    gray=false;
-    viewupdate();
-  }
   let blackpoints=0,whitepoints=0;
   for(let i=0;i<8;i++)for(let j=0;j<8;j++){
     if(data[i][j]==1)blackpoints++;
@@ -152,6 +148,10 @@ function finish(){
     if(blackpoints>whitepoints)result.innerText="Black Win!";
     if(blackpoints<whitepoints)result.innerText="White Win!";
     if(blackpoints==whitepoints)result.innerText="Draw";
+  }
+  if(gray){
+    gray=false;
+    viewupdate();
   }
 }
 
