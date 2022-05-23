@@ -2,12 +2,13 @@ var data=new Array(8);
 for(var i=0;i<8;i++)data[i]=new Array(8);
 for(var i=0;i<8;i++)for(let j=0;j<8;j++)data[i][j]=0;
 
+var computer=false;
 var turn=true;
-var blackpoints,whitepoints;
+var gray=false;
 const dydx=[[-1, 0],[-1, 1],[0, 1],[1, 1],[1, 0],[1, -1],[0, -1],[-1, -1]];
 const board=document.getElementById("board");
-const html_blackpoints=document.getElementById("blackpoints");
-const html_whitepoints=document.getElementById("whitepoints");
+const points=document.getElementById("points");
+const result=document.getElementById("result");
 
 for(let i=0;i<8;i++){
   const column=document.createElement("tr");
@@ -27,10 +28,13 @@ function viewupdate(){
     for(let j=0;j<8;j++)
       if(data[i][j]==0)
         board.rows[i].cells[j].style.backgroundColor="green";
-      else if(data[i][j]==1)
-        board.rows[i].cells[j].style.backgroundColor="black";
-      else 
-        board.rows[i].cells[j].style.backgroundColor="white";
+      else
+        if(gray)
+          board.rows[i].cells[j].style.backgroundColor="gray";
+        else if(data[i][j]==1)
+          board.rows[i].cells[j].style.backgroundColor="black";
+        else 
+          board.rows[i].cells[j].style.backgroundColor="white";
 }
 
 function init(){
@@ -40,9 +44,9 @@ function init(){
   data[3][3]=data[4][4]=1;
   data[3][4]=data[4][3]=-1;
   turn=true;
-  blackpoints=2;
-  whitepoints=2;
   viewupdate();
+  result.innerText="";
+  points.innerText="";
 }
 
 function isin(y,x){
@@ -99,16 +103,80 @@ function rotate(){
       data[j][7-i]=cpy[i][j];
 }
 
-document.getElementById("startbutton").onclick=function(){init();}
+document.getElementById("startbutton1").onclick=function(){
+  init();
+  computer=false;
+  gray=false;
+}
+document.getElementById("startbutton2").onclick=function(){
+  init();
+  computer=false;
+  gray=true;
+}
+document.getElementById("startbutton3").onclick=function(){
+  init();
+  computer=true;
+  gray=false;
+}
+document.getElementById("startbutton4").onclick=function(){
+  init();
+  computer=true;
+  gray=true;
+}
+
+function finish(){
+  let color=1;
+  if(!turn)color=-1;
+  for(let i=0;i<8;i++)for(let j=0;j<8;j++)if(canput(i,j,color))return;
+  if(gray){
+    gray=false;
+    viewupdate();
+  }
+  let blackpoints=0,whitepoints=0;
+  for(let i=0;i<8;i++)for(let j=0;j<8;j++){
+    if(data[i][j]==1)blackpoints++;
+    if(data[i][j]==-1)whitepoints++;
+  }
+  points.innerText="黒:"+blackpoints.toString()+" 白:"+whitepoints.toString();
+  if(computer){
+    if(blackpoints>whitepoints)result.innerText="You Win!";
+    if(blackpoints<whitepoints)result.innerText="You Lose!";
+    if(blackpoints==whitepoints)result.innerText="Draw!";
+  }
+  else{
+    if(blackpoints>whitepoints)result.innerText="Black Win!";
+    if(blackpoints<whitepoints)result.innerText="White Win!";
+    if(blackpoints==whitepoints)result.innerText="Draw";
+  }
+}
 
 function clicked(){
   let y=this.parentNode.rowIndex;
   let x=this.cellIndex;
   let color=1;
   if(!turn)color=-1;
-  if(!canput(y,x,color))return;
+  if(!canput(y,x,color)){
+    document.getElementById("cant").innerText="そこは置けないの分かる？"
+    return;
+  }
+  document.getElementById("cant").innerText="";
   putothello(y,x,color);
   rotate();
   viewupdate();
   turn=!turn;
+
+  finish();
+
+  if(computer){
+    for(let i=0;i<8;i++)
+      for(let j=0;j<8;j++)
+        if(canput(i,j,-1)){
+          putothello(i,j,-1);
+          console.log("CPU:",i,j);
+          i=j=8;
+        }
+    viewupdate();
+    turn=!turn;
+    finish();
+  }
 }
