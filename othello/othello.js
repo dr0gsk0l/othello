@@ -3,8 +3,8 @@ for(var i=0;i<8;i++)data[i]=new Array(8);
 for(var i=0;i<8;i++)for(let j=0;j<8;j++)data[i][j]=0;
 
 var computer=false;
-var turn=true;
 var gray=false;
+var turn=1;
 const dydx=[[-1, 0],[-1, 1],[0, 1],[1, 1],[1, 0],[1, -1],[0, -1],[-1, -1]];
 const board=document.getElementById("board");
 const points=document.getElementById("points");
@@ -43,7 +43,7 @@ function init(){
       data[i][j]=0;
   data[3][3]=data[4][4]=1;
   data[3][4]=data[4][3]=-1;
-  turn=true;
+  turn=1;
   viewupdate();
   result.innerText="";
   points.innerText="";
@@ -104,30 +104,32 @@ function rotate(){
 }
 
 document.getElementById("startbutton1").onclick=function(){
-  init();
   computer=false;
   gray=false;
+  init();
 }
 document.getElementById("startbutton2").onclick=function(){
-  init();
   computer=false;
   gray=true;
+  init();
 }
 document.getElementById("startbutton3").onclick=function(){
-  init();
   computer=true;
   gray=false;
+  init();
 }
 document.getElementById("startbutton4").onclick=function(){
-  init();
   computer=true;
   gray=true;
+  init();
+}
+
+function canputanywhere(color){
+  for(let i=0;i<8;i++)for(let j=0;j<8;j++)if(canput(i,j,color))return true;
+  return false;
 }
 
 function finish(){
-  let color=1;
-  if(!turn)color=-1;
-  for(let i=0;i<8;i++)for(let j=0;j<8;j++)if(canput(i,j,color))return;
   if(gray){
     gray=false;
     viewupdate();
@@ -153,30 +155,40 @@ function finish(){
 function clicked(){
   let y=this.parentNode.rowIndex;
   let x=this.cellIndex;
-  let color=1;
-  if(!turn)color=-1;
-  if(!canput(y,x,color)){
+  if(!canput(y,x,turn)){
     document.getElementById("cant").innerText="そこは置けないの分かる？"
     return;
   }
   document.getElementById("cant").innerText="";
-  putothello(y,x,color);
+  putothello(y,x,turn);
   rotate();
   viewupdate();
-  turn=!turn;
+  turn=-turn;
 
-  finish();
+  if(!canputanywhere(turn)){
+    turn=-turn;
+    if(!canputanywhere(turn))finish();
+  }
 
-  if(computer){
+  while(computer && turn==-1){
+    let mx=-1,y,x;
     for(let i=0;i<8;i++)
       for(let j=0;j<8;j++)
-        if(canput(i,j,-1)){
-          putothello(i,j,-1);
-          console.log("CPU:",i,j);
-          i=j=8;
-        }
+        if(canput(i,j,-1))
+          if(mx<pointscore(i,j)){
+            mx=pointscore(i,j);
+            y=i,x=j;
+          }
+    putothello(y,x,-1);
     viewupdate();
-    turn=!turn;
-    finish();
+    turn=-turn;
+    if(!canputanywhere(turn)){
+      turn=-turn;
+      if(!canputanywhere(turn))finish();
+    }
   }
+}
+
+function pointscore(y,x){
+  return (y-3)*(y-4)+(x-3)*(x-4);
 }
