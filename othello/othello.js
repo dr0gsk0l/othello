@@ -5,10 +5,12 @@ for(var i=0;i<8;i++)for(let j=0;j<8;j++)data[i][j]=0;
 var computer=false;
 var turn=1;
 var gray=false;
+var misscnt=0;
 const dydx=[[-1, 0],[-1, 1],[0, 1],[1, 1],[1, 0],[1, -1],[0, -1],[-1, -1]];
 const board=document.getElementById("board");
 const points=document.getElementById("points");
 const result=document.getElementById("result");
+const miss=document.getElementById("miss");
 
 for(let i=0;i<8;i++){
   const column=document.createElement("tr");
@@ -38,6 +40,7 @@ function viewupdate(){
 }
 
 function init(){
+  misscnt=0;
   for(let i=0;i<8;i++)
     for(let j=0;j<8;j++)
       data[i][j]=0;
@@ -45,6 +48,7 @@ function init(){
   data[3][4]=data[4][3]=-1;
   turn=1;
   viewupdate();
+  miss.innerText="ミス数="+misscnt.toString();
   result.innerText="";
   points.innerText="";
 }
@@ -160,6 +164,8 @@ function clicked(){
   let x=this.cellIndex;
   if(!canput(y,x,turn)){
     document.getElementById("cant").innerText="そこは置けないの分かる？"
+    misscnt++;
+    miss.innerText="ミス数="+misscnt.toString();
     return;
   }
   document.getElementById("cant").innerText="";
